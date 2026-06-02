@@ -210,7 +210,7 @@
       if (!track) return;
       var panels = gsap.utils.toArray(".hpanel", track);
       var distance = function () { return track.scrollWidth - document.documentElement.clientWidth + 40; };
-      /* cinematic focus: the panel nearest center grows + brightens, others recede */
+      /* cinematic focus: panel nearest center grows + brightens, others recede */
       function focus() {
         var cx = window.innerWidth / 2;
         panels.forEach(function (p) {
@@ -235,6 +235,13 @@
         }
       });
       focus();
+      /* return cleanup fn so gsap.matchMedia tears down on resize below 901px */
+      return function () {
+        panels.forEach(function (p) {
+          gsap.set(p, { clearProps: "scale,opacity,transform" });
+        });
+        gsap.set(track, { clearProps: "x,transform" });
+      };
     });
 
     /* ===== MANIFESTO — word-by-word scrub highlight ===== */

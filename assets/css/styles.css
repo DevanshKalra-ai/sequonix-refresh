@@ -30,12 +30,12 @@
   --faint-on-dark:#9A9584;
 
   /* type scale (fluid) */
-  --step--1: clamp(0.82rem, 0.79rem + 0.15vw, 0.92rem);
-  --step-0:  clamp(1rem, 0.95rem + 0.25vw, 1.15rem);
-  --step-1:  clamp(1.25rem, 1.1rem + 0.7vw, 1.6rem);
-  --step-2:  clamp(1.7rem, 1.4rem + 1.4vw, 2.6rem);
-  --step-3:  clamp(2.3rem, 1.7rem + 2.9vw, 4rem);
-  --step-4:  clamp(3rem, 1.9rem + 5.4vw, 6.5rem);
+  --step--1: clamp(0.88rem, 0.84rem + 0.2vw, 0.95rem);
+  --step-0:  clamp(1.05rem, 1rem + 0.35vw, 1.2rem);
+  --step-1:  clamp(1.3rem, 1.15rem + 0.75vw, 1.65rem);
+  --step-2:  clamp(1.75rem, 1.45rem + 1.5vw, 2.7rem);
+  --step-3:  clamp(2.4rem, 1.8rem + 3vw, 4.1rem);
+  --step-4:  clamp(3.1rem, 2rem + 5.5vw, 6.6rem);
   --step-5:  clamp(3.8rem, 2rem + 8.5vw, 9rem);
 
   /* spacing / layout */
@@ -484,10 +484,37 @@ body.menu-open .hamburger span::after { top: 0; transform: rotate(-45deg); }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 900px) {
-  /* horizontal panels fall back to a vertical stack (JS skips the pin) */
-  .hpanels-pin { height: auto; display: block; padding-block: clamp(3.5rem,9vw,6rem); }
-  .hpanels-track { flex-direction: column; padding-inline: var(--gutter); }
-  .hpanel { flex: none; width: 100%; height: auto; min-height: 240px; }
+  /* horizontal panels → native swipe carousel on mobile/tablet */
+  .hpanels-pin { height: auto; display: block; padding-block: clamp(2.5rem,7vw,5rem); overflow: visible; }
+  .hpanels-hint { display: none; }
+  .hpanels-head { padding-bottom: 1.4rem; }
+  .hpanels-track {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    padding-inline: var(--gutter);
+    padding-bottom: 1.4rem;
+    overflow-x: auto;
+    overflow-y: visible;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 1rem;
+    transform: none !important; /* override any residual JS transform */
+  }
+  .hpanels-track::-webkit-scrollbar { display: none; }
+  .hpanel {
+    flex: 0 0 min(76vw, 320px);
+    height: auto;
+    min-height: 260px;
+    scroll-snap-align: start;
+    opacity: 1 !important;
+    scale: none !important;
+    transform: none !important;
+  }
+  /* swipe hint dots */
+  .hpanels-swipe-hint { display: flex; justify-content: center; gap: .5rem; padding-top: .6rem; }
+  .hpanels-swipe-hint span { width: 28px; height: 3px; border-radius: 3px; background: var(--line); }
+  .hpanels-swipe-hint span:first-child { background: var(--emerald); }
   .manifesto-pin { min-height: auto; }
 }
 @media (max-width: 720px) {
@@ -497,10 +524,18 @@ body.menu-open .hamburger span::after { top: 0; transform: rotate(-45deg); }
   .nav-cta { margin-left: 0; }
   .hamburger { display: flex; z-index: 101; }
   .tech-grid { grid-template-columns: repeat(3, 1fr); }
-  .timeline, .stats-strip, .footer-grid, .form-row { grid-template-columns: 1fr; }
+  .timeline, .footer-grid, .form-row { grid-template-columns: 1fr; }
+  /* stats: 2-column on mobile so it doesn't look empty */
+  .stats-strip { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .stat-box { padding: 1.6rem 1.4rem; }
+  .stat-box .num { font-size: clamp(2.6rem, 11vw, 3.6rem); }
+  .stat-box .lbl { font-size: var(--step-0); margin-top: .5rem; }
   .hero-stats { gap: 1.6rem 2.5rem; }
   .hero h1, .page-header h1 { font-size: clamp(2.4rem, 11.5vw, 3.6rem); overflow-wrap: break-word; hyphens: auto; }
-  .hero .lead, .page-header p { font-size: var(--step-0); }
+  .hero .lead, .page-header p { font-size: var(--step-1); }
+  /* body paragraph size boost on mobile */
+  p { font-size: var(--step-0); }
+  .section-head p, .card p, .hpanel p, .feature-item p, .tl-step p { font-size: var(--step-0); line-height: 1.65; }
   .scrolly-step .k { font-size: clamp(1.9rem, 12vw, 2.9rem); }
   .scrolly-step p { font-size: var(--step-0); }
   .scrolly-steps { min-height: 6.5em; }
@@ -510,9 +545,10 @@ body.menu-open .hamburger span::after { top: 0; transform: rotate(-45deg); }
 }
 
 /* ---------- STATIC FALLBACK (no JS motion / reduced-motion) ---------- */
-body.motion-off .hpanels-pin { height: auto; display: block; padding-block: clamp(3.5rem,9vw,6rem); }
-body.motion-off .hpanels-track { flex-direction: column; transform: none !important; }
-body.motion-off .hpanel { flex: none; width: 100%; height: auto; min-height: 240px; }
+body.motion-off .hpanels-pin { height: auto; display: block; padding-block: clamp(2.5rem,7vw,5rem); }
+body.motion-off .hpanels-track { overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; transform: none !important; }
+body.motion-off .hpanels-track::-webkit-scrollbar { display: none; }
+body.motion-off .hpanel { flex: 0 0 min(76vw,360px); height: auto; min-height: 260px; scroll-snap-align: start; opacity: 1 !important; }
 body.motion-off .manifesto-pin { min-height: auto; }
 body.motion-off .manifesto-text .w { color: var(--ink); }
 body.motion-off .manifesto-text .w.em { color: var(--emerald-bright); }
