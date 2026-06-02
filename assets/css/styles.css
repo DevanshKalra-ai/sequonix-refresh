@@ -484,38 +484,42 @@ body.menu-open .hamburger span::after { top: 0; transform: rotate(-45deg); }
   .footer-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 900px) {
-  /* horizontal panels → native swipe carousel on mobile/tablet */
-  .hpanels-pin { height: auto; display: block; padding-block: clamp(2.5rem,7vw,5rem); overflow: visible; }
+  /* vertical-scroll card switcher — same feel as desktop but stacked */
+  .hpanels-pin { height: 100vh; display: flex; flex-direction: column; justify-content: flex-start; overflow: hidden; padding-top: clamp(1.8rem,5vw,3rem); }
   .hpanels-hint { display: none; }
-  .hpanels-head { padding-bottom: 1.4rem; }
+  .hpanels-swipe-hint { display: none; }
+  /* track becomes a relative layer; JS stacks cards absolutely inside it */
   .hpanels-track {
-    flex-direction: row;
-    flex-wrap: nowrap;
+    position: relative;
+    flex: 1;
+    width: 100%;
     padding-inline: var(--gutter);
-    padding-bottom: 1.4rem;
-    overflow-x: auto;
-    overflow-y: visible;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: 1rem;
-    transform: none !important; /* override any residual JS transform */
-  }
-  .hpanels-track::-webkit-scrollbar { display: none; }
-  .hpanel {
-    flex: 0 0 min(76vw, 320px);
-    height: auto;
-    min-height: 260px;
-    scroll-snap-align: start;
-    opacity: 1 !important;
-    scale: none !important;
+    overflow: visible;
     transform: none !important;
+    gap: 0;
   }
-  /* swipe hint dots */
-  .hpanels-swipe-hint { display: flex; justify-content: center; gap: .5rem; padding-top: .6rem; }
-  .hpanels-swipe-hint span { width: 28px; height: 3px; border-radius: 3px; background: var(--line); }
-  .hpanels-swipe-hint span:first-child { background: var(--emerald); }
-  .manifesto-pin { min-height: auto; }
+  .hpanel {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: unset;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(28px);
+    transition: opacity .45s ease, transform .45s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .hpanel.mobile-active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  /* progress dots */
+  .hpanels-mob-dots { display: flex; gap: .45rem; padding: 0 var(--gutter) .8rem; }
+  .hpanels-mob-dots span { height: 3px; border-radius: 3px; background: var(--line); transition: background .3s, width .3s; width: 18px; }
+  .hpanels-mob-dots span.on { background: var(--emerald); width: 32px; }
 }
 @media (max-width: 720px) {
   .nav-links { position: fixed; inset: 0 0 0 auto; width: min(82vw, 360px); flex-direction: column; align-items: flex-start; justify-content: center; gap: .5rem; padding: 2rem; background: var(--paper); box-shadow: -20px 0 60px rgba(0,0,0,.15); transform: translateX(100%); transition: transform .5s var(--ease); z-index: 99; }
@@ -540,15 +544,17 @@ body.menu-open .hamburger span::after { top: 0; transform: rotate(-45deg); }
   .scrolly-step p { font-size: var(--step-0); }
   .scrolly-steps { min-height: 6.5em; }
   .scrolly-count { font-size: clamp(6rem, 32vw, 11rem); top: 9vh; }
-  .manifesto-text { font-size: clamp(1.5rem, 6.4vw, 2.2rem); line-height: 1.25; }
-  .manifesto-pin { padding-block: 14vh; }
+  /* manifesto: fill the screen on mobile */
+  .manifesto-pin { min-height: 100vh; padding-block: 8vh; display: flex; align-items: center; }
+  .manifesto-text { font-size: clamp(1.95rem, 7.8vw, 3rem); line-height: 1.22; }
+  .manifesto-inner { padding-inline: var(--gutter); }
 }
 
 /* ---------- STATIC FALLBACK (no JS motion / reduced-motion) ---------- */
-body.motion-off .hpanels-pin { height: auto; display: block; padding-block: clamp(2.5rem,7vw,5rem); }
-body.motion-off .hpanels-track { overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; transform: none !important; }
-body.motion-off .hpanels-track::-webkit-scrollbar { display: none; }
-body.motion-off .hpanel { flex: 0 0 min(76vw,360px); height: auto; min-height: 260px; scroll-snap-align: start; opacity: 1 !important; }
+/* motion-off: show all panels as a simple vertical list */
+body.motion-off .hpanels-pin { height: auto; padding-block: clamp(2.5rem,7vw,5rem); }
+body.motion-off .hpanels-track { position: relative; display: flex; flex-direction: column; gap: 1rem; padding-inline: var(--gutter); transform: none !important; overflow: visible; }
+body.motion-off .hpanel { position: relative; inset: unset; opacity: 1 !important; transform: none !important; pointer-events: auto; height: auto; min-height: 200px; }
 body.motion-off .manifesto-pin { min-height: auto; }
 body.motion-off .manifesto-text .w { color: var(--ink); }
 body.motion-off .manifesto-text .w.em { color: var(--emerald-bright); }
